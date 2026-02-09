@@ -1,16 +1,10 @@
-<p align="center">
-  <a href="https://grid-layout-plus.netlify.app/" target="_blank" rel="noopener noreferrer">
-    <img src="./docs/public/grid-layout-plus.svg" width="180" style="width: 120px;" />
-  </a>
-</p>
+<h1 align="center">Fork of: Grid Layout Plus</h1>
 
-<h1 align="center">Grid Layout Plus</h1>
+Functionally its the same, though now support 4 edge resize and appropriate position compensation.
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/grid-layout-plus" target="_blank">
-    <img src="https://img.shields.io/github/package-json/v/qmhc/grid-layout-plus" alt="npm version"/>
-  </a>
-</p>
+> **⚠️ This project is maintained for internal use and is not the original [Vue Grid Layout](https://github.com/jbaysolutions/vue-grid-layout). For compatibility and migration guidance, please see the documentation and [issues](https://github.com/qmhc/grid-layout-plus/issues).**
+
+## As per license and community spirit, it remains open.
 
 ## What is Grid Layout Plus?
 

@@ -55,7 +55,7 @@ const layout = inject(LAYOUT_KEY)
 const emitter = inject(EMITTER_KEY)!
 
 if (!layout) {
-  throw new Error('[grid-layout-plus]: missing layout store, GridItem must under a GridLayout.')
+  throw new Error('[grid-islands]: missing layout store, GridItem must under a GridLayout.')
 }
 
 const interactObj = shallowRef<InstanceType<
@@ -111,7 +111,6 @@ let previousW = -1
 let previousH = -1
 let previousX = -1
 let previousY = -1
-
 
 let innerX = props.x
 let innerY = props.y

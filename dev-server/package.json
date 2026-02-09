@@ -1,5 +1,5 @@
 {
-  "name": "grid-layout-plus-dev-server",
+  "name": "grid-islands-dev-server",
   "private": true,
   "scripts": {
     "serve": "vite"
