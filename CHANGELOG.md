@@ -1,3 +1,8 @@
+## <small>1.2.3 (2026-02-09)</small>
+
+
+
+
 ## <small>1.2.2 (2026-02-09)</small>
 
 * ffix workflow name ([9d247c3](https://github.com/ProjectMercator/grid-islands/commit/9d247c3))
