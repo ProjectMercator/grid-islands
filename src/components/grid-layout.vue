@@ -394,16 +394,29 @@ function resizeEvent(
   }
 
   const proposed = { x, y, w, h }
+  const baseRight = l.x + l.w
+  const baseBottom = l.y + l.h
   let next = { ...proposed }
+
+  if (proposed.x !== l.x) {
+    next.x = proposed.x
+    next.w = Math.max(baseRight - next.x, 1)
+  }
+  if (proposed.y !== l.y) {
+    next.y = proposed.y
+    next.h = Math.max(baseBottom - next.y, 1)
+  }
+
+  const normalized = { ...next }
   if (props.preventCollision) {
-    const collisions = getAllCollisions(currentLayout.value, { ...l, ...proposed }).filter(
+    const collisions = getAllCollisions(currentLayout.value, { ...l, ...normalized }).filter(
       layoutItem => layoutItem.i !== l.i,
     )
     if (collisions.length > 0) {
-      const proposedRight = proposed.x + proposed.w
-      const proposedBottom = proposed.y + proposed.h
+      const proposedRight = normalized.x !== l.x ? baseRight : normalized.x + normalized.w
+      const proposedBottom = normalized.y !== l.y ? baseBottom : normalized.y + normalized.h
 
-      if (proposed.x < l.x) {
+      if (normalized.x < l.x) {
         let maxLeft = -Infinity
         collisions.forEach(layoutItem => {
           if (layoutItem.x < l.x) {
@@ -415,7 +428,7 @@ function resizeEvent(
           next.x = Math.max(next.x, maxLeft)
           next.w = Math.max(proposedRight - next.x, 1)
         }
-      } else if (proposed.w > l.w) {
+      } else if (normalized.w > l.w) {
         let minRight = Infinity
         collisions.forEach(layoutItem => {
           if (layoutItem.x > l.x) {
@@ -428,7 +441,7 @@ function resizeEvent(
         }
       }
 
-      if (proposed.y < l.y) {
+      if (normalized.y < l.y) {
         let maxTop = -Infinity
         collisions.forEach(layoutItem => {
           if (layoutItem.y < l.y) {
@@ -440,7 +453,7 @@ function resizeEvent(
           next.y = Math.max(next.y, maxTop)
           next.h = Math.max(proposedBottom - next.y, 1)
         }
-      } else if (proposed.h > l.h) {
+      } else if (normalized.h > l.h) {
         let minBottom = Infinity
         collisions.forEach(layoutItem => {
           if (layoutItem.y > l.y) {

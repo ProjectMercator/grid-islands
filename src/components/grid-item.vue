@@ -506,8 +506,6 @@ function handleResize(event: MouseEvent & { edges: any }) {
 
       state.resizing = { width: -1, height: -1 }
       state.isResizing = false
-      state.resizingPosition = { left: -1, top: -1 }
-      state.resizingEdges = { left: false, right: false, top: false, bottom: false }
       break
     }
   }
@@ -562,6 +560,11 @@ function handleResize(event: MouseEvent & { edges: any }) {
     emit('resized', props.i, pos.h, pos.w, newSize.height, newSize.width)
   }
   emitter.emit('resizeEvent', event.type, props.i, nextX, nextY, pos.h, pos.w)
+
+  if (event.type === 'resizeend') {
+    state.resizingPosition = { left: -1, top: -1 }
+    state.resizingEdges = { left: false, right: false, top: false, bottom: false }
+  }
 }
 
 function handleDrag(event: MouseEvent) {
