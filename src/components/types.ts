@@ -20,7 +20,8 @@ export interface GridLayoutProps {
   breakpoints?: Breakpoints,
   cols?: Breakpoints,
   preventCollision?: boolean,
-  useStyleCursor?: boolean
+  useStyleCursor?: boolean,
+  resizeFromEdges?: boolean
 }
 
 export interface GridItemProps {
@@ -42,5 +43,6 @@ export interface GridItemProps {
   resizeIgnoreFrom?: string,
   preserveAspectRatio?: boolean,
   dragOption?: Record<string, any>,
-  resizeOption?: Record<string, any>
+  resizeOption?: Record<string, any>,
+  resizeFromEdges?: boolean
 }
