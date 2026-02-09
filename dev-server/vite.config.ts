@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import autoprefixer from 'autoprefixer'
+import vueDevTools from 'vite-plugin-vue-devtools'
+
 
 export default defineConfig(async () => {
   return {
@@ -15,6 +17,6 @@ export default defineConfig(async () => {
         allow: ['..'],
       },
     },
-    plugins: [vue()],
+    plugins: [vue(), vueDevTools()],
   }
 })

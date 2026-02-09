@@ -54,6 +54,7 @@ const props = withDefaults(defineProps<GridLayoutProps>(), {
   cols: () => ({ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }),
   preventCollision: false,
   useStyleCursor: true,
+  resizeFromEdges: false,
 })
 
 const emit = defineEmits([
@@ -392,38 +393,91 @@ function resizeEvent(
     l = { h: 0, w: 0, x: 0, y: 0, i: '' }
   }
 
-  let hasCollisions
+  const proposed = { x, y, w, h }
+  const baseRight = l.x + l.w
+  const baseBottom = l.y + l.h
+  let next = { ...proposed }
+
+  if (proposed.x !== l.x) {
+    next.x = proposed.x
+    next.w = Math.max(baseRight - next.x, 1)
+  }
+  if (proposed.y !== l.y) {
+    next.y = proposed.y
+    next.h = Math.max(baseBottom - next.y, 1)
+  }
+
+  const normalized = { ...next }
   if (props.preventCollision) {
-    const collisions = getAllCollisions(currentLayout.value, { ...l, w, h }).filter(
+    const collisions = getAllCollisions(currentLayout.value, { ...l, ...normalized }).filter(
       layoutItem => layoutItem.i !== l.i,
     )
-    hasCollisions = collisions.length > 0
+    if (collisions.length > 0) {
+      const proposedRight = normalized.x !== l.x ? baseRight : normalized.x + normalized.w
+      const proposedBottom = normalized.y !== l.y ? baseBottom : normalized.y + normalized.h
 
-    // If we're colliding, we need adjust the placeholder.
-    if (hasCollisions) {
-      // adjust w && h to maximum allowed space
-      let leastX = Infinity
-      let leastY = Infinity
-      collisions.forEach(layoutItem => {
-        if (layoutItem.x > l.x) leastX = Math.min(leastX, layoutItem.x)
-        if (layoutItem.y > l.y) leastY = Math.min(leastY, layoutItem.y)
-      })
+      if (normalized.x < l.x) {
+        let maxLeft = -Infinity
+        collisions.forEach(layoutItem => {
+          if (layoutItem.x < l.x) {
+            maxLeft = Math.max(maxLeft, layoutItem.x + layoutItem.w)
+          }
+        })
 
-      if (Number.isFinite(leastX)) l.w = leastX - l.x
-      if (Number.isFinite(leastY)) l.h = leastY - l.y
+        if (Number.isFinite(maxLeft)) {
+          next.x = Math.max(next.x, maxLeft)
+          next.w = Math.max(proposedRight - next.x, 1)
+        }
+      } else if (normalized.w > l.w) {
+        let minRight = Infinity
+        collisions.forEach(layoutItem => {
+          if (layoutItem.x > l.x) {
+            minRight = Math.min(minRight, layoutItem.x)
+          }
+        })
+
+        if (Number.isFinite(minRight)) {
+          next.w = Math.max(minRight - next.x, 1)
+        }
+      }
+
+      if (normalized.y < l.y) {
+        let maxTop = -Infinity
+        collisions.forEach(layoutItem => {
+          if (layoutItem.y < l.y) {
+            maxTop = Math.max(maxTop, layoutItem.y + layoutItem.h)
+          }
+        })
+
+        if (Number.isFinite(maxTop)) {
+          next.y = Math.max(next.y, maxTop)
+          next.h = Math.max(proposedBottom - next.y, 1)
+        }
+      } else if (normalized.h > l.h) {
+        let minBottom = Infinity
+        collisions.forEach(layoutItem => {
+          if (layoutItem.y > l.y) {
+            minBottom = Math.min(minBottom, layoutItem.y)
+          }
+        })
+
+        if (Number.isFinite(minBottom)) {
+          next.h = Math.max(minBottom - next.y, 1)
+        }
+      }
     }
   }
 
-  if (!hasCollisions) {
-    // Set new width and height.
-    l.w = w
-    l.h = h
-  }
+  // Set new position and size.
+  l.x = next.x
+  l.y = next.y
+  l.w = next.w
+  l.h = next.h
 
   if (eventName === 'resizestart' || eventName === 'resizemove') {
     state.placeholder.i = id
-    state.placeholder.x = x
-    state.placeholder.y = y
+    state.placeholder.x = next.x
+    state.placeholder.y = next.y
     state.placeholder.w = l.w
     state.placeholder.h = l.h
     nextTick(() => {
@@ -511,7 +565,12 @@ function findDifference(layout: Layout, originalLayout: Layout) {
   <div ref="wrapper" class="vgl-layout" :style="state.mergedStyle">
     <slot v-if="$slots.default"></slot>
     <template v-else>
-      <GridItem v-for="item in currentLayout" :key="item.i" v-bind="item">
+      <GridItem
+        v-for="item in currentLayout"
+        :key="item.i"
+        v-bind="item"
+        :resize-from-edges="props.resizeFromEdges"
+      >
         <slot name="item" :item="item"></slot>
       </GridItem>
     </template>
@@ -523,6 +582,7 @@ function findDifference(layout: Layout, originalLayout: Layout) {
       :w="state.placeholder.w"
       :h="state.placeholder.h"
       :i="state.placeholder.i"
+      :resize-from-edges="props.resizeFromEdges"
     ></GridItem>
   </div>
 </template>

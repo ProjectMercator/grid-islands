@@ -50,6 +50,8 @@
     z-index: var(--vgl-item-resizing-z-index, 3);
     user-select: none;
     opacity: var(--vgl-item-resizing-opacity, 60%);
+    transition: none;
+    transition-property: none;
   }
 
   &--dragging {
