@@ -95,6 +95,10 @@ const state = reactive({
     top: false,
     bottom: false
   },
+  resizingAnchor: {
+    right: -1,
+    bottom: -1
+  },
   style: {} as Record<string, string>,
   rtl: false
 })
@@ -452,6 +456,10 @@ function handleResize(event: MouseEvent & { edges: any }) {
           top: !!edges.top,
           bottom: !!edges.bottom
         }
+        state.resizingAnchor = {
+          right: innerX + innerW,
+          bottom: innerY + innerH
+        }
       }
       newSize.width = pos.width
       newSize.height = pos.height
@@ -553,6 +561,26 @@ function handleResize(event: MouseEvent & { edges: any }) {
     nextY = yFromTop
   }
 
+  if (props.resizeFromEdges) {
+    if (state.resizingEdges.left && !state.resizingEdges.right && state.resizingAnchor.right >= 0) {
+      pos.w = Math.max(state.resizingAnchor.right - nextX, 1)
+    }
+    if (state.resizingEdges.top && !state.resizingEdges.bottom && state.resizingAnchor.bottom >= 0) {
+      pos.h = Math.max(state.resizingAnchor.bottom - nextY, 1)
+    }
+
+    const corrected = calcPosition(nextX, nextY, pos.w, pos.h)
+    state.resizing.width = corrected.width
+    state.resizing.height = corrected.height
+    if (state.resizingEdges.left || state.resizingEdges.top) {
+      const correctedLeft = renderRtl.value
+        ? state.containerWidth - corrected.right! - corrected.width
+        : corrected.left!
+      state.resizingPosition.left = correctedLeft
+      state.resizingPosition.top = corrected.top
+    }
+  }
+
   if (innerW !== pos.w || innerH !== pos.h) {
     emit('resize', props.i, pos.h, pos.w, newSize.height, newSize.width)
   }
@@ -564,6 +592,7 @@ function handleResize(event: MouseEvent & { edges: any }) {
   if (event.type === 'resizeend') {
     state.resizingPosition = { left: -1, top: -1 }
     state.resizingEdges = { left: false, right: false, top: false, bottom: false }
+    state.resizingAnchor = { right: -1, bottom: -1 }
   }
 }
 
