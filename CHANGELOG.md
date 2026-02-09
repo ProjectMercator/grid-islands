@@ -1,3 +1,8 @@
+## <small>1.2.1 (2026-02-09)</small>
+
+
+
+
 ## 1.2.0 (2026-02-09)
 
 * first pass ([0c2da49](https://github.com/ProjectMercator/grid-islands/commit/0c2da49))
